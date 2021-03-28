@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgitbank.mapper.UserMapper">
+
+	<!-- 회원가입 -->
+	<insert id="insertUser" parameterType="map">
+		INSERT INTO
+		sh_userInfo(userID,kakaoMail,userNick,latitude,longitude,address,userCreateDate)
+		VALUES(
+		userID_seq.nextval, #{kakaoMail}, #{userNick}, #{latitude},
+		#{longitude}, #{address}, sysdate
+		)
+	</insert>
+
+	<!-- 회원가입 유무 확인 -->
+	<select id="selectKakaoMail" resultType="Integer">
+		select count(*) from
+		sh_userInfo where kakaoMail=#{kakaoMail}
+	</select>
+
+	<!-- 계정 삭제 -->
+	<delete id="deleteUserInfo">
+		{
+		call
+		declare
+		begin
+		delete from sh_userinfo where userNick =#{userNick};
+		delete from sh_item where userNick =#{userNick};
+		delete from chat_info where buyerName=#{userNick} or sellerName =
+		#{userNick};
+		end
+		}
+	</delete>
+
+	<!-- 계정 탈퇴 유저 -->
+	<insert id="insertWithdrawal">
+		INSERT INTO
+		withdrawal(withdrawalID,
+		userNick,ncontent,kakaoMail,phoneNumber,banDate)
+		VALUES(withdrawal_seq.nextval,
+		#{userNick},
+		#{ncontent}, #{kakaoMail,
+		jdbcType=VARCHAR},#{phoneNumber,
+		jdbcType=VARCHAR},sysdate+7
+		)
+	</insert>
+
+	<!-- 계정 탈퇴 사유 -->
+	<select id="selectWithdrawal"
+		resultType="com.kgitbank.model.WithdrawalVO">
+		select * from withdrawal
+	</select>
+
+
+
+
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgitbank.mapper.ChattingMapper">
+
+	<insert id="createChatInfo">
+
+		INSERT INTO
+		chat_info(chatID,roomId,buyerName,sellerName,item,price)
+		VALUES(
+		chatID_seq.nextval, #{roomId,jdbcType=NUMERIC},
+		#{buyerName,jdbcType=VARCHAR},
+		#{sellerName,jdbcType=VARCHAR}, #{item,jdbcType=VARCHAR}, #{price,jdbcType=NUMERIC}
+		)
+
+	</insert>
+
+	<select id="selectSellerName"
+		resultType="com.kgitbank.model.ChattingVO">
+
+		select * from chat_info where sellerName=#{sellerName,jdbcType=VARCHAR}
+
+	</select>
+
+	<select id="selectBuyerName"
+		resultType="com.kgitbank.model.ChattingVO">
+
+		select * from chat_info where buyerName=#{buyerName,jdbcType=VARCHAR}
+
+	</select>
+
+	<update id="updateChatInfo">
+		UPDATE chat_info
+		SET
+		chatDate = sysdate
+		WHERE roomId = #{roomId}
+	</update>
+
+	<select id="selectRoomId" resultType="Integer">
+		select count(*) from
+		chat_info where roomId=#{roomId}
+	</select>
+
+	<update id="updateSellerCount">
+		update chat_info
+		set
+		sellerCount=sellerCount+1
+		where roomId = #{roomId}
+	</update>
+
+	<update id="updateBuyerCount">
+		update chat_info
+		set
+		buyerCount=buyerCount+1
+		where roomId = #{roomId}
+	</update>
+
+
+	<update id="resetSellerCount">
+		update chat_info set sellerCount=0 where roomId =
+		#{roomId}
+	</update>
+	<update id="resetBuyerCount">
+		update chat_info set buyerCount=0 where roomId =
+		#{roomId}
+	</update>
+
+	<update id="resetCountAll">
+		update chat_info set buyerCount=0,sellerCount=0
+	</update>
+
+	<delete id="deleteChat">
+		delete from chat_info where roomId = #{roomId}
+	</delete>
+
+</mapper>
+
+
+
+

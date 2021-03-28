@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+                http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<bean id="hikariConfig2" class="com.zaxxer.hikari.HikariConfig">
+		<property name="dataSourceClassName"
+			value="oracle.jdbc.pool.OracleDataSource" /> 
+		<property name="dataSourceProperties">
+			<props>
+				<prop key="user">hr</prop>
+				<prop key="password">1234</prop>
+				<prop key="url">jdbc:oracle:thin:@localhost:1521/XEPDB1</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+		<constructor-arg ref="hikariConfig2" />
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- <bean id="config" class="com.zaxxer.hikari.HikariConfig"> 
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver" /> 
+		<property name="jdbcUrl" value = "jdbc:oracle:thin:@61.84.29.58:1521/xe" /> 
+		<property name="username" value="c##wymarket" /> 
+		<property name="password" value="1234" /> 
+	</bean>
+	
+	<bean id="dataSource" class ="com.zaxxer.hikari.HikariDataSource"> 
+		<constructor-arg ref="config" /> 
+	</bean> 
+	
+	<bean id ="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+		<property name="dataSource" ref="dataSource" /> 
+	</bean> -->
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<context:component-scan
+		base-package="com.kgitbank.model" /> <!-- graph 탭에 해당 패키지의 컴포넌트 관계 표시됨 -->
+
+	<context:component-scan
+		base-package="com.kgitbank.service" />
+
+	<context:component-scan
+		base-package="com.kgitbank.util" />
+
+	<mybatis-spring:scan
+		base-package="com.kgitbank.mapper" />
+
+ 
+
+<!-- 공용 DB 할 때 -->
+<!-- <bean id="config" class="com.zaxxer.hikari.HikariConfig"> <property 
+	name="driverClassName" value="oracle.jdbc.OracleDriver" /> <property name="jdbcUrl" 
+	value = "jdbc:oracle:thin:@61.77.190.253:1521/xe" /> <property name="username" 
+	value="c##wymarket" /> <property name="password" value="1234" /> </bean>
+	<bean id="dataSource" class ="com.zaxxer.hikari.HikariDataSource"> <constructor-arg 
+	ref="config" /> </bean> <bean id ="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+	<property name="dataSource" ref="dataSource" /> </bean> -->
+
+	</beans>
+	

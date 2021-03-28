@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgitbank.mapper.WYmarketMapper">
+
+	<select id="getAdminPhCount" resultType="Integer">
+		select count(*) from
+		sh_adminInfo where phoneNumber=#{phoneNumber, jdbcType=VARCHAR}
+	</select>
+
+	<select id="getAdminInfo" resultType="Map">
+		select * from
+		sh_adminInfo
+		where phoneNumber=#{phoneNumber, jdbcType=VARCHAR}
+	</select>
+
+	<select id="getAdminInfo2"
+		resultType="com.kgitbank.model.AdminInfo">
+		select * from
+		sh_adminInfo
+		where adminGrade='정'
+	</select>
+
+	<update id="updateAdminMemo">
+		UPDATE sh_adminInfo SET adminMemo =
+		#{adminMemo,
+		jdbcType=VARCHAR}
+		WHERE adminGrade =
+		#{adminGrade}
+	</update>
+
+	<select id="selectAdminMemo" resultType="String">
+		select adminMemo from
+		sh_adminInfo where adminGrade=#{adminGrade}
+	</select>
+
+	<update id="updateUserBan">
+		UPDATE sh_userInfo SET ban = 'Y'
+		WHERE userNick =
+		#{userNick}
+	</update>
+
+	<update id="updateUserUnBan">
+		UPDATE sh_userInfo SET ban = 'N'
+		WHERE userNick =
+		#{userNick}
+	</update>
+
+	<select id="selectUserBan" resultType="String">
+		select ban from
+		sh_userInfo where userNick=#{userNick}
+	</select>
+
+	<select id="selectUserById"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT * FROM sh_userInfo WHERE userID = #{search,
+		jdbcType=NUMERIC} ORDER
+		BY userID
+		OFFSET (#{pageNum}
+		- 1) *
+		#{amount}
+		ROWS FETCH FIRST #{amount}
+		ROWS ONLY
+	</select>
+	<select id="selectUserByNick"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT * FROM sh_userInfo WHERE userNick LIKE '%' ||
+		#{search, jdbcType=VARCHAR} || '%' ORDER
+		BY userID
+		OFFSET (#{pageNum}
+		-
+		1) *
+		#{amount}
+		ROWS FETCH FIRST #{amount}
+		ROWS ONLY
+	</select>
+	<select id="selectUserByAddress"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT * FROM sh_userInfo WHERE address LIKE '%' ||
+		#{search, jdbcType=VARCHAR} || '%' ORDER
+		BY userID
+		OFFSET (#{pageNum}
+		-
+		1) *
+		#{amount}
+		ROWS FETCH FIRST #{amount}
+		ROWS ONLY
+	</select>
+
+	<insert id="insertUserAccessDate">
+		INSERT INTO sh_userAccessDate
+		VALUES
+		(userAccessDate_seq.nextval, #{userNick}, sysdate)
+	</insert>
+
+	<select id="selectUserAccessCount" resultType="Integer">
+		select count(*)
+		from
+		sh_userAccessDate WHERE userNick = #{userNick}
+	</select>
+
+	<select id="selectUserAccessDate" resultType="Date">
+		select
+		MAX(accessDate)
+		from
+		sh_userAccessDate WHERE userNick = #{userNick}
+	</select>
+
+	<update id="updateUserCountTotal">
+		UPDATE sh_userCountTotal SET total =
+		#{userAccessCount}
+	</update>
+
+	<select id="selectAccessCount" resultType="Integer">
+		select count(*) from
+		sh_userAccessDate
+	</select>
+
+	<select id="selectAccessCountByDate" resultType="Integer">
+		select count(*)
+		from
+		sh_userAccessDate WHERE accessDate LIKE #{totalDate} || '%'
+	</select>
+
+	<select id="selectUserCountTotal" resultType="Integer">
+		select total from
+		sh_userCountTotal
+	</select>
+
+	<select id="selectUserCount" resultType="Integer">
+		select count(*) from
+		sh_userInfo
+	</select>
+
+	<select id="selectUserCountId" resultType="Integer">
+		select count(*) from
+		sh_userInfo WHERE userId = #{search}
+	</select>
+
+	<select id="selectUserCountNick" resultType="Integer">
+		select count(*) from
+		sh_userInfo WHERE userNick LIKE '%' || #{search} || '%'
+	</select>
+
+	<select id="selectUserCountAddress" resultType="Integer">
+		select count(*)
+		from
+		sh_userInfo WHERE address LIKE '%' || #{search} || '%'
+	</select>
+
+	<select id="selectUserList"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT * FROM sh_userInfo ORDER BY userID
+		OFFSET (#{pageNum}
+		- 1) *
+		#{amount}
+		ROWS FETCH FIRST #{amount} ROWS ONLY
+	</select>
+
+
+	<select id="selectusernick" resultType="Integer">
+		select count(*) from
+		sh_userInfo where userNick=#{userNick}
+	</select>
+
+	<select id="selectphonenumber" resultType="Integer">
+		select count(*) from
+		sh_userInfo where phoneNumber=#{phoneNumber, jdbcType=VARCHAR}
+	</select>
+
+	<select id="getIpCnt" resultType="Integer">
+		select count(*) from
+		sh_userIP
+		where IP=#{IP}
+	</select>
+
+	<select id="getSmsCnt" resultType="int">
+		SELECT smsCnt FROM sh_userIP
+		WHERE IP = #{IP}
+	</select>
+
+	<insert id="insertIp">
+		INSERT INTO sh_userIP(IP)
+		VALUES (#{IP})
+	</insert>
+
+	<update id="updateIpCnt">
+		UPDATE sh_userIP SET smsCnt = smsCnt + 1
+		WHERE IP =
+		#{IP}
+	</update>
+
+	<update id="insertSmsExceedDate">
+		UPDATE sh_userIP SET smsExceedDate = sysdate
+		WHERE IP
+		= #{IP}
+	</update>
+
+	<select id="getSmsExceedDate" resultType="Date">
+		select smsExceedDate
+		from
+		sh_userIP where IP=#{IP}
+	</select>
+
+	<update id="updateSmsExceedDate">
+		UPDATE sh_userIP SET smsCnt = 1, smsExceedDate = null
+		WHERE IP =
+		#{IP}
+	</update>
+
+	<insert id="insertUserPhNk">
+		INSERT INTO sh_userInfo(userID, phoneNumber,
+		userNick, latitude, longitude, address, userCreateDate)
+		VALUES
+		(userID_seq.nextval,
+		#{phoneNumber}, #{userNick}, #{latitude},
+		#{longitude}, #{address}, sysdate)
+	</insert>
+
+	<select id="selectUserInfo"
+		resultType="com.kgitbank.model.UserInfo">
+		select * from
+		sh_userInfo where phoneNumber =#{phoneNumber}
+	</select>
+
+	<select id="getUserNickByPh" resultType="String">
+		select userNick from
+		sh_userInfo where phoneNumber=#{phoneNumber}
+	</select>
+
+	<select id="getUserNickByMail" resultType="String">
+		select userNick from
+		sh_userInfo where kakaomail=#{kakaomail}
+	</select>
+
+	<select id="selectSignupCountByDate" resultType="Integer">
+		select count(*)
+		from
+		sh_userInfo WHERE userCreateDate LIKE #{totalDate} || '%'
+	</select>
+
+	<select id="selectUserInfoByMail"
+		resultType="com.kgitbank.model.UserInfo">
+		select * from
+		sh_userInfo where kakaomail=#{kakaomail}
+	</select>
+
+	<select id="selectUserBySignupDate"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT * FROM sh_userInfo WHERE userCreateDate LIKE
+		#{search} || '%' ORDER BY userCreateDate
+		OFFSET (#{pageNum} - 1) *
+		#{amount}
+		ROWS FETCH FIRST #{amount} ROWS ONLY
+	</select>
+
+	<select id="selectIdByUserNick" resultType="Integer">
+		select userid from
+		sh_userInfo where usernick=#{userNick}
+	</select>
+
+	<select id="selectUserNickFromItem" resultType="String">
+		SELECT Distinct
+		userNick
+		FROM
+		sh_item
+	</select>
+
+	<select id="selectLatLong"
+		resultType="com.kgitbank.model.UserInfo">
+		select latitude, longitude from
+		sh_userInfo where
+		usernick=#{userNick}
+	</select>
+
+	<select id="selectCountFromItem" resultType="Integer">
+		SELECT
+		count(*)
+		FROM
+		sh_item
+	</select>
+
+	<insert id="insertInquiryInfo">
+		INSERT INTO sh_inquiry
+		VALUES
+		(inquiry_seq.nextval,
+		#{userNick}, #{inquiryCategory}, #{inquiryContent}, sysdate)
+	</insert>
+
+	<select id="selectInquiryInfo"
+		resultType="com.kgitbank.model.Inquiry">
+		select * from
+		sh_inquiry order by inquiryDate desc
+	</select>
+
+	<update id="updateInquiryCountTotal">
+		UPDATE sh_inquiryCountTotal SET total = total + 1
+	</update>
+
+	<select id="selectInquiryCountTotal" resultType="Integer">
+		select total
+		from
+		sh_inquiryCountTotal
+	</select>
+
+	<update id="resetInquiryCountTotal">
+		UPDATE sh_inquiryCountTotal SET total = 0
+	</update>
+
+	<insert id="insertInquiryAdminToUser">
+		INSERT INTO sh_inquiryAdminToUser
+		VALUES
+		(inquiryAdminToUser_seq.nextval, #{userInquiryID},
+		#{userNick},
+		#{inquiryCategory}, #{inquiryContent}, sysdate)
+	</insert>
+
+	<select id="selectInquiryAdminToUser"
+		resultType="com.kgitbank.model.InquiryAdminToUser">
+		select *
+		from
+		sh_inquiryAdminToUser order by inquiryDate desc
+	</select>
+
+	<select id="selectInquiryAdminToUserByID"
+		resultType="com.kgitbank.model.InquiryAdminToUser">
+		select *
+		from
+		sh_inquiryAdminToUser WHERE inquiryID =
+		#{inquiryID}
+	</select>
+
+	<select id="selectMaxInquiryAdminToUserByID"
+		resultType="Integer">
+		select MAX(inquiryID)
+		from
+		sh_inquiryAdminToUser
+	</select>
+
+	<select id="selectInquiryByID"
+		resultType="com.kgitbank.model.Inquiry">
+		select *
+		from
+		sh_inquiry WHERE inquiryID =
+		#{inquiryID}
+	</select>
+
+	<select id="selectInquiryAdminToUserByUserNick"
+		resultType="com.kgitbank.model.InquiryAdminToUser">
+		select *
+		from
+		sh_inquiryAdminToUser WHERE userNick =
+		#{userNick} order by inquiryDate desc
+	</select>
+
+	<select id="selectInquiryByUserNick"
+		resultType="com.kgitbank.model.Inquiry">
+		select *
+		from
+		sh_inquiry WHERE userNick =
+		#{userNick}
+	</select>
+
+	<update id="updateInquiryUserCountTotal">
+		UPDATE sh_inquiryUserCountTotal SET total = total + 1
+	</update>
+
+	<select id="selectInquiryUserCountTotal" resultType="Integer">
+		select total
+		from
+		sh_inquiryUserCountTotal
+	</select>
+
+	<update id="resetInquiryUserCountTotal">
+		UPDATE sh_inquiryUserCountTotal SET total = 0
+	</update>
+
+	<delete id='deleteSearchInDistance'>
+		DELETE FROM sh_searchInDistance
+	</delete>
+
+	<insert id="insertSearchInDistance">
+		INSERT INTO sh_searchInDistance
+		VALUES
+		(searchInDistance_seq.nextval, #{iimagepath, jdbcType=VARCHAR},
+		#{usernick}, #{address},
+		#{manner}, #{ititle}, #{icategory},
+		#{refreshtime}, #{icontent},
+		#{price},
+		#{chatcnt}, #{likecnt},
+		#{viewcnt}, #{istate},
+		#{ireservationstate})
+	</insert>
+
+	<select id="selectSearchInDistance"
+		resultType="com.kgitbank.model.SearchInDistance">
+		select * from sh_searchInDistance
+	</select>
+
+	<!-- search상품 테이블 조회 -->
+	<select id="selectSearchGoods"
+		resultType="com.kgitbank.model.SearchInDistance">
+		select *
+		from
+		sh_searchInDistance WHERE stitle LIKE '%' ||
+		#{search} || '%'
+	</select>
+
+	<!-- category상품 테이블 조회 -->
+	<select id="selectCategoryGoods"
+		resultType="com.kgitbank.model.SearchInDistance">
+		select * from sh_searchInDistance where scategory =
+		#{scategory}
+	</select>
+
+	<update id="updateLatLonAddress">
+		UPDATE sh_userInfo SET latitude =
+		#{latitude},
+		longitude = #{longitude}, address = #{address}
+		WHERE userNick =
+		#{userNick}
+	</update>
+
+	<select id="selectUserInfoByUserNick"
+		resultType="com.kgitbank.model.UserInfo">
+		select * from
+		sh_userInfo where userNick =#{userNick}
+	</select>
+
+	<update id="updateAddressFromItem">
+		UPDATE sh_item SET address = #{address}
+		WHERE userNick
+		= #{userNick}
+	</update>
+
+	<update id="updateAddressFromSearchInDistance">
+		UPDATE sh_searchInDistance SET address = #{address}
+		WHERE userNick =
+		#{userNick}
+	</update>
+
+	<select id="selectSearchInDistanceById"
+		resultType="com.kgitbank.model.SearchInDistance">
+		select * from sh_searchInDistance where itemID = #{itemID}
+	</select>
+
+	<select id="selectItemByUserNick"
+		resultType="com.kgitbank.model.GoodsVO">
+		select itemid, iimagepath, usernick,
+		address, manner,
+		ititle,
+		icategory, icontent,
+		(SELECT EXTRACT(DAY FROM
+		systimestamp - tm)
+		*24*60*60
+		+ EXTRACT(HOUR FROM systimestamp - tm) *60*60
+		+ EXTRACT(MINUTE
+		FROM systimestamp - tm) *60
+		+ EXTRACT(SECOND FROM systimestamp - tm) AS
+		second
+		FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff')
+		tm FROM
+		dual)) as refreshtime,
+		price, chatcnt, likecnt,
+		viewcnt, istate,
+		ireservationstate
+		from sh_item where userNick = #{userNick} ORDER BY
+		refreshtime desc
+	</select>
+
+	<select id="selectItemByUserNickSearch"
+		resultType="com.kgitbank.model.GoodsVO">
+		select
+		itemid, iimagepath, usernick,
+		address, manner, ititle,
+		icategory, icontent,
+		(SELECT EXTRACT(DAY FROM
+		systimestamp - tm)
+		*24*60*60
+		+ EXTRACT(HOUR FROM systimestamp - tm) *60*60
+		+ EXTRACT(MINUTE
+		FROM systimestamp - tm) *60
+		+ EXTRACT(SECOND FROM systimestamp - tm) AS
+		second
+		FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff')
+		tm FROM
+		dual)) as refreshtime,
+		price, chatcnt, likecnt,
+		viewcnt, istate,
+		ireservationstate
+		from sh_item where userNick = #{userNick} and
+		UPPER(ititle) LIKE UPPER('%'
+		||
+		#{search} || '%') ORDER BY
+		refreshtime
+		desc
+	</select>
+
+	<select id="selectItemByUserNickCategory"
+		resultType="com.kgitbank.model.GoodsVO">
+		select itemid, iimagepath, usernick,
+		address, manner,
+		ititle,
+		icategory, icontent,
+		(SELECT EXTRACT(DAY FROM
+		systimestamp - tm)
+		*24*60*60
+		+ EXTRACT(HOUR FROM systimestamp - tm) *60*60
+		+ EXTRACT(MINUTE
+		FROM systimestamp - tm) *60
+		+ EXTRACT(SECOND FROM systimestamp - tm) AS
+		second
+		FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff')
+		tm FROM
+		dual)) as refreshtime,
+		price, chatcnt, likecnt,
+		viewcnt, istate,
+		ireservationstate
+		from sh_item where userNick = #{userNick} and
+		icategory LIKE ('%' ||
+		#{icategory} || '%')
+		ORDER BY
+		refreshtime desc
+	</select>
+
+	<select id="selectCountFromWithdrawByPhoneNumber"
+		resultType="Integer">
+		SELECT
+		count(*)
+		FROM
+		withdrawal WHERE phoneNumber =
+		#{phoneNumber}
+	</select>
+
+	<select id="selectCountFromWithdrawByKakaoMail"
+		resultType="Integer">
+		SELECT
+		count(*)
+		FROM
+		withdrawal WHERE kakaoMail = #{kakaoMail}
+	</select>
+
+	<select id="selectBanDateByPhoneNumber" resultType="Date">
+		SELECT
+		Max(banDate)
+		FROM
+		withdrawal WHERE phoneNumber = #{phoneNumber}
+	</select>
+
+	<delete id='deleteWithdrawalByPhoneNumber'>
+		DELETE FROM withdrawal WHERE phoneNumber =
+		#{phoneNumber}
+	</delete>
+
+	<select id="selectReSignUpByPhoneNumberAndMaxDate"
+		resultType="String">
+		SELECT
+		reSignUp
+		FROM
+		withdrawal WHERE bandate = (select
+		max(bandate) from withdrawal) and phoneNumber = #{phoneNumber}
+	</select>
+	<select id="selectReSignUpByPhoneNumber" resultType="String">
+		SELECT
+		reSignUp
+		FROM
+		withdrawal WHERE phoneNumber = #{phoneNumber}
+	</select>
+
+	<update id="updateReSignUpByPhoneNumber">
+		UPDATE withdrawal SET reSignUp = 'Y'
+		WHERE
+		phoneNumber
+		= #{phoneNumber}
+	</update>
+
+	<update id="updateReSignUpByPhoneNumberAndMaxDate">
+		UPDATE withdrawal SET reSignUp = 'Y'
+		WHERE
+		bandate =
+		(select
+		max(bandate) from withdrawal) and phoneNumber =
+		#{phoneNumber}
+	</update>
+
+	<select id="selectReSignUpByMail" resultType="String">
+		SELECT
+		reSignUp
+		FROM
+		withdrawal WHERE kakaoMail = #{kakaoMail}
+	</select>
+
+	<select id="selectReSignUpByMailAndMaxDate" resultType="String">
+		SELECT
+		reSignUp
+		FROM
+		withdrawal WHERE bandate = (select
+		max(bandate) from
+		withdrawal) and kakaoMail = #{kakaoMail}
+	</select>
+
+	<update id="updateReSignUpByMail">
+		UPDATE withdrawal SET reSignUp = 'Y'
+		WHERE
+		kakaoMail =
+		#{kakaoMail}
+	</update>
+
+	<update id="updateReSignUpByMailAndMaxDate">
+		UPDATE withdrawal SET reSignUp = 'Y'
+		WHERE
+		bandate =
+		(select
+		max(bandate) from withdrawal) and kakaoMail = #{kakaoMail}
+	</update>
+
+	<select id="selectBanDateByMail" resultType="Date">
+		SELECT
+		Max(banDate)
+		FROM
+		withdrawal WHERE kakaoMail = #{kakaoMail}
+	</select>
+
+	<select id="selectUserByAccessDate"
+		resultType="com.kgitbank.model.UserInfo">
+		SELECT accessID, phoneNumber,
+		kakaoMail, a.userNick,
+		latitude, longitude, address, manner, accessDate,
+		buyItemCnt,
+		saleItemCnt, reviewCnt, keyWord, ban FROM sh_userInfo a,
+		sh_userAccessDate b WHERE a.userNick = b.usernick and b.accessDate
+		LIKE #{search} || '%' ORDER BY accessDate
+		OFFSET (#{pageNum} - 1) *
+		#{amount} ROWS FETCH FIRST #{amount} ROWS ONLY
+	</select>
+
+
+
+</mapper>
+
+
+

@@ -1,0 +1,13 @@
+*{
+	box-sizing: border-box;
+}
+
+#smsContent{
+	display: none;
+}
+#getsmscode, #getph{
+	display: none;
+}
+#nickcontainer{
+	display: none;
+}

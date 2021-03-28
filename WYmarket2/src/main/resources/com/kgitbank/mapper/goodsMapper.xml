@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgitbank.mapper.goodsMapper">
+
+	<!-- 상품 목록 -->
+	<select id="getGoodsList"
+		resultType="com.kgitbank.model.GoodsVO">		
+
+		SELECT  itemid, iimagepath, usernick, 
+	 	address, manner, ititle,
+		icategory, icontent, (SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime,
+		price, chatcnt, likecnt,
+		viewcnt, istate, ireservationstate
+		from sh_item where usernick in (select usernick from sh_userinfo where ban = 'N')
+		order by refreshtime desc
+
+	</select>
+
+
+
+	<!-- 상품 등록 -->
+	<insert id="createGoods">
+		INSERT INTO sh_item (itemid, usernick, ititle, address, manner,
+		icategory, refreshtime, icontent, price, iimagepath, istate)
+
+		VALUES (
+		itemID_seq.nextval,
+		#{user},
+		#{ititle},
+		(select address from sh_userinfo where usernick = #{user}),  <!-- 추가된 부분 -->
+		(select manner from sh_userinfo where usernick = #{user}),  <!-- 추가된 부분 -->
+		#{icategory},
+		sysdate,
+		#{icontent},
+		#{price},
+		#{iimagepath},
+		'Onsale'
+		)
+	</insert>
+
+	<!-- 등록 상품 조회 -->
+	<select id="getGoods" resultType="com.kgitbank.model.GoodsVO">
+		SELECT itemid, iimagepath, usernick, 
+	 	address, manner, ititle,
+		icategory, icontent, (SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime,
+		price, chatcnt, likecnt,
+		viewcnt, istate, ireservationstate FROM sh_item WHERE itemid = #{itemid}
+		<!-- SELECT * FROM sh_searchInDistance WHERE itemid = #{itemid} -->
+	</select>
+
+	<!-- 유저아이디(시퀀스) 조회 -->
+	<select id="getId" resultType="java.lang.String">
+		select userID from sh_userInfo
+		where userNick = #{userNick}
+	</select>
+
+	<!-- 상품목록 수정 -->
+	<update id="goodsModify">
+		update sh_item
+		set
+		iimagepath = #{iimagepath},
+		ititle = #{ititle},
+		icategory = #{icategory},
+		price = #{price},
+		icontent = #{icontent}
+		where itemid = ${itemid}
+	</update>
+
+<delete id="goodsDelete">
+	delete from sh_item where itemid = #{itemid}
+</delete>
+
+
+</mapper>

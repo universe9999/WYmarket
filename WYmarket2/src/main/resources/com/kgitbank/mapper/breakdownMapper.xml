@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kgitbank.mapper.breakdownMapper">
+
+<select id="getShuserInfo" resultType="com.kgitbank.model.ShUserInfoVO">
+SELECT usernick from sh_userInfo 
+</select>
+
+<select id="getUserItemList" resultType="com.kgitbank.model.ShItemVO">
+	<![CDATA[
+			SELECT * FROM
+		(SELECT
+			rownum rn, itemID, iImagePath, userNick,
+			address, manner, iTitle, iCategory,
+			(SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime, iContent, price, 
+			chatCnt, likeCnt, viewCnt, iState,
+			iReservationState
+			FROM
+			 sh_item
+			WHERE
+			 	rownum <= #{pagenum} * #{amount}  and  usernick = #{usernick}
+		)
+	WHERE
+		rn > (#{pagenum} -1) * #{amount} order by refreshtime asc
+		]]>
+</select>
+
+
+<select id="searchUserItemList" resultType="com.kgitbank.model.ShItemVO">
+	<![CDATA[
+			SELECT * FROM
+		(SELECT
+			rownum rn, itemID, iImagePath, userNick,
+			address, manner, iTitle, iCategory,
+			(SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime, iContent, price, 
+			chatCnt, likeCnt, viewCnt, iState,
+			iReservationState
+			FROM
+			 sh_item
+			WHERE
+			 	rownum <= #{pagenum} * #{amount}  and  usernick = #{usernick} 
+			 	and ititle LIKE '%' || #{psearch, jdbcType=VARCHAR} || '%')  
+	WHERE
+		rn > (#{pagenum} -1) * #{amount} order by refreshtime asc
+		]]>
+</select>
+ 
+<select id="searchCount" resultType="int">
+		select count(*)
+		from
+		sh_item WHERE usernick = #{usernick} and  ititle LIKE  '%' || #{psearch} || '%'
+</select>
+
+
+
+<select id="selectStateCategory" resultType="com.kgitbank.model.ShItemVO">
+	<![CDATA[
+			SELECT * FROM
+		(SELECT
+			rownum rn, itemID, iImagePath, userNick,
+			address, manner, iTitle, iCategory,
+			(SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime, iContent, price, 
+			chatCnt, likeCnt, viewCnt, iState,
+			iReservationState
+			FROM
+			 sh_item
+			WHERE
+			 	rownum <= #{pagenum} * #{amount}  and  usernick = #{usernick}  and iState = '#{istate}') 
+			 	
+	WHERE
+		rn > (#{pagenum} -1) * #{amount}
+		]]>
+</select>
+
+
+
+<select id="getShuserInfoCdate" resultType="int">
+<![CDATA[
+SELECT 
+ (SELECT EXTRACT(DAY FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(usercreatedate, 'yy/mm/dd hh24:mi:ss') tm FROM dual)) as usercreatedate
+		from sh_userinfo where usernick = #{usernick} 
+		]]>	
+</select>
+
+<select id="getShitemVO" resultType="com.kgitbank.model.ShItemVO">
+<![CDATA[
+SELECT  itemID, iImagePath, userNick, 
+	 	address, manner, iTitle,
+		iCategory, (SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime, iContent,
+		price, chatCnt, likeCnt,
+		viewCnt, iState, iReservationState
+		from sh_item where usernick = #{usernick} order by refreshtime asc
+			]]>	
+</select>
+
+
+
+<select id="getPurchaserPhVO" resultType="com.kgitbank.model.PurchasedetailsVO">
+	<![CDATA[
+SELECT itemID, iImagePath, Purchaser, 
+	   usernick, address, iTitle,
+	   (SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime,
+  		 price, chatCnt, likeCnt, viewCnt 
+	   from purchasedetails where purchaser = #{purchaser} 
+]]>	
+</select>
+
+<select id="getSellerPhVO" resultType="com.kgitbank.model.PurchasedetailsVO">
+	<![CDATA[
+SELECT itemID, iImagePath, Purchaser, 
+	   usernick, address, iTitle,
+	   (SELECT EXTRACT(DAY    FROM systimestamp - tm) *24*60*60
+     + EXTRACT(HOUR   FROM systimestamp - tm) *60*60
+     + EXTRACT(MINUTE FROM systimestamp - tm) *60
+     + EXTRACT(SECOND FROM systimestamp - tm) AS second
+  FROM (SELECT TO_TIMESTAMP(refreshtime, 'yy/mm/dd hh24:mi:ss.ff') tm FROM dual)) as refreshtime,
+  		 price, chatCnt, likeCnt, viewCnt 
+	   from purchasedetails where usernick = #{usernick} 
+]]>	
+</select>
+
+<select id="shitemVOCount" resultType="int">
+		SELECT COUNT(*) from sh_item where usernick = #{usernick} and istate = 'Onsale'
+</select>
+
+<select id="getCount" resultType="int">
+		SELECT COUNT(*) from sh_item where usernick = #{usernick}
+</select>
+
+<select id="purchasedetailsCount" resultType="int">
+		SELECT COUNT(*) from purchasedetails where usernick = #{usernick}
+</select>
+
+
+
+<update id="updateUserInfoNick">
+UPDATE sh_userInfo SET usernick = #{modiyusernick} where usernick = #{usernick}
+</update>
+
+<update id="updateUserItemNick">
+UPDATE sh_item SET usernick = #{modiyusernick} where usernick = #{usernick}
+</update>
+
+
+<update id="completedIstate">
+UPDATE sh_item SET istate = #{istate} where ititle = #{ititle} AND usernick = #{usernick} AND itemid = #{itemid}
+</update>
+
+ 
+ <update id="hiddenIstate">
+UPDATE sh_item SET istate = #{istate} where ititle = #{ititle} AND usernick = #{usernick} AND itemid = #{itemid}
+</update>
+
+ <update id="reservationStateChange">
+UPDATE sh_item SET iReservationState = #{iReservationState} where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}
+</update>
+ 
+<update id="productPullUp">
+UPDATE sh_item SET refreshtime = sysdate where ititle = #{ititle} AND usernick = #{usernick} AND istate = #{istate} AND itemid = #{itemid}
+</update>
+
+<delete id="productDelete">
+DELETE from sh_item  where ititle = #{ititle} AND usernick = #{usernick} AND istate = #{istate} AND itemid = #{itemid}
+</delete>
+
+
+
+
+
+<insert id="insertPurchase">
+INSERT INTO purchasedetails (itemid, iImagePath,purchaser,usernick,address,ititle,price, likeCnt, viewCnt) values(
+(select itemid from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select iImagePath from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+	  		#{purchaser},
+(select usernick from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select address from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select ititle from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select price from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select likeCnt from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid}),
+(select viewCnt from sh_item where ititle = #{ititle} AND istate = #{istate} AND usernick = #{usernick} AND itemid = #{itemid})
+)	  	 
+</insert>
+
+
+</mapper>
